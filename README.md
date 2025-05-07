@@ -36,12 +36,87 @@ Step 5: **Security Foundation
 The security of RSA relies on the difficulty of factoring large numbers; thus, choosing sufficiently large prime numbers for \( p \) and \( q \) is crucial for security.
 
 ## Program:
+```
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
 
+# Modular exponentiation
+def mod_exp(base, exp, mod):
+    result = 1
+    while exp > 0:
+        if exp % 2 == 1:
+            result = (result * base) % mod
+        base = (base * base) % mod
+        exp //= 2
+    return result
 
+# Modular inverse using Extended Euclidean Algorithm
+def mod_inverse(e, phi):
+    t, newt = 0, 1
+    r, newr = phi, e
+    while newr != 0:
+        quotient = r // newr
+        t, newt = newt, t - quotient * newt
+        r, newr = newr, r - quotient * newr
+    if r > 1:
+        return -1  # No modular inverse
+    if t < 0:
+        t += phi
+    return t
 
+def main():
+    # Step 1: Choose primes
+    p = 61
+    q = 53
+
+    # Step 2: Compute n and phi
+    n = p * q
+    phi = (p - 1) * (q - 1)
+
+    # Step 3: Choose public key e
+    e = 17
+    if gcd(e, phi) != 1:
+        print("e and phi(n) are not coprime!")
+        return
+
+    # Step 4: Compute private key d
+    d = mod_inverse(e, phi)
+    if d == -1:
+        print("No modular inverse found for e!")
+        return
+
+    # Step 5: Display keys
+    print(f"Public Key: (e = {e}, n = {n})")
+    print(f"Private Key: (d = {d}, n = {n})")
+
+    # Step 6: Get message input
+    message = input("Enter a message to encrypt (alphabetic characters only): ")
+
+    # Step 7: Encrypt message
+    encrypted = []
+    print("\nEncrypted Message:")
+    for ch in message:
+        m = ord(ch)
+        c = mod_exp(m, e, n)
+        encrypted.append(c)
+        print(c, end=' ')
+    print()
+
+    # Step 8: Decrypt message
+    print("\nDecrypted Message:")
+    for c in encrypted:
+        m = mod_exp(c, d, n)
+        print(chr(m), end='')
+    print()
+
+if __name__ == "__main__":
+    main()
+```
 
 ## Output:
-
+![image](https://github.com/user-attachments/assets/d1bba1ba-23ed-4c46-987a-0a1eae560bd3)
 
 
 ## Result:
